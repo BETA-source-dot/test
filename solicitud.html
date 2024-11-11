@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+	<script type="module">
+		// Import the functions you need from the SDKs you need
+		import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+		// TODO: Add SDKs for Firebase products that you want to use
+		// https://firebase.google.com/docs/web/setup#available-libraries
+	  
+		// Your web app's Firebase configuration
+		const firebaseConfig = {
+		  apiKey: "AIzaSyDAhOqKnogmr7sMPm72EsdhRlNrDu-_nQo",
+		  authDomain: "test-461f6.firebaseapp.com",
+		  databaseURL: "https://test-461f6-default-rtdb.firebaseio.com",
+		  projectId: "test-461f6",
+		  storageBucket: "test-461f6.firebasestorage.app",
+		  messagingSenderId: "424061095375",
+		  appId: "1:424061095375:web:86aba69fc5665f5d9516ba"
+		};
+	  
+		// Initialize Firebase
+		const app = initializeApp(firebaseConfig);
+	  </script>
 	<title>Subject</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -305,33 +325,23 @@
 	<script src="./js/ripples.min.js"></script>
 	<script src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
 	<script src="./js/main.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
 	<script>
 		$.material.init();
 	</script>
 	<script>
 		// Función para guardar datos en el archivo JSON
 		function saveData() {
-			const code = document.getElementById('code').value;
-			const name = document.getElementById('name').value;
-			const status = document.getElementById('status').value;
-	
-			const newData = { code, name, status };
-	
-			// Obtener los datos del archivo JSON
-			fetch('data.json')
-				.then(response => response.json())
-				.then(data => {
-					// Agregar el nuevo dato
-					data.push(newData);
-	
-					// Actualizar el archivo JSON (en un servidor real, esto se haría mediante una petición POST)
-					saveToJSON(data);
-	
-					// Actualizar la tabla de List
-					displayData();
-				});
-		}
-	
+    		const code = document.getElementById('code').value;
+    		const name = document.getElementById('name').value;
+    		const status = document.getElementById('status').value;
+
+    	db.ref('data').push({ code, name, status })
+        	.then(() => console.log("Datos guardados en Firebase"))
+        	.catch(error => console.error("Error al guardar datos:", error));
+	}
+
 		// Función para actualizar la base de datos (simulación en frontend)
 		function saveToJSON(data) {
 			// Para un entorno de desarrollo en local, guardar en el archivo JSON no es posible sin un backend.
@@ -341,26 +351,24 @@
 	
 		// Función para mostrar datos en la tabla
 		function displayData() {
-			fetch('data.json')
-				.then(response => response.json())
-				.then(data => {
-					const listTableBody = document.querySelector('#list tbody');
-					listTableBody.innerHTML = ''; // Limpiar la tabla
-	
-					data.forEach((item, index) => {
-						const row = `<tr>
-							<td>${index + 1}</td>
-							<td>${item.code}</td>
-							<td>${item.name}</td>
-							<td>${item.status}</td>
-							<td><a href="#!" class="btn btn-success btn-raised btn-xs"><i class="zmdi zmdi-refresh"></i></a></td>
-							<td><a href="#!" class="btn btn-danger btn-raised btn-xs"><i class="zmdi zmdi-delete"></i></a></td>
-						</tr>`;
-						listTableBody.insertAdjacentHTML('beforeend', row);
-					});
-				});
-		}
-	
+    db.ref('data').once('value', (snapshot) => {
+        const listTableBody = document.querySelector('#list tbody');
+        listTableBody.innerHTML = '';
+
+        snapshot.forEach((childSnapshot) => {
+            const item = childSnapshot.val();
+            const row = `<tr>
+                <td>${item.code}</td>
+                <td>${item.name}</td>
+                <td>${item.status}</td>
+                <td><a href="#!" class="btn btn-success btn-raised btn-xs"><i class="zmdi zmdi-refresh"></i></a></td>
+                <td><a href="#!" class="btn btn-danger btn-raised btn-xs"><i class="zmdi zmdi-delete"></i></a></td>
+            </tr>`;
+            listTableBody.insertAdjacentHTML('beforeend', row);
+        });
+    });
+}
+
 		// Cargar datos al inicio
 		document.addEventListener('DOMContentLoaded', displayData);
 	</script>
