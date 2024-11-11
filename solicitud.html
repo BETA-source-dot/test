@@ -133,26 +133,26 @@
 							<div class="container-fluid">
 								<div class="row">
 									<div class="col-xs-12 col-md-10 col-md-offset-1">
-									    <form action="">
-									    	<div class="form-group label-floating">
-											  <label class="control-label">Code</label>
-											  <input class="form-control" type="text">
+										<form id="requestForm">
+											<div class="form-group label-floating">
+												<label class="control-label">Code</label>
+												<input class="form-control" type="text" id="code" required>
 											</div>
-									    	<div class="form-group label-floating">
-											  <label class="control-label">Name</label>
-											  <input class="form-control" type="text">
+											<div class="form-group label-floating">
+												<label class="control-label">Name</label>
+												<input class="form-control" type="text" id="name" required>
 											</div>
 											<div class="form-group">
-										      <label class="control-label">Status</label>
-										        <select class="form-control">
-										          <option>Active</option>
-										          <option>Disable</option>
-										        </select>
-										    </div>
-										    <p class="text-center">
-										    	<button href="#!" class="btn btn-info btn-raised btn-sm"><i class="zmdi zmdi-floppy"></i> Save</button>
-										    </p>
-									    </form>
+												<label class="control-label">Status</label>
+												<select class="form-control" id="status">
+													<option>Active</option>
+													<option>Disable</option>
+												</select>
+											</div>
+											<p class="text-center">
+												<button type="button" class="btn btn-info btn-raised btn-sm" onclick="saveData()"><i class="zmdi zmdi-floppy"></i> Save</button>
+											</p>
+										</form>										
 									</div>
 								</div>
 							</div>
@@ -307,37 +307,62 @@
 	<script src="./js/main.js"></script>
 	<script>
 		$.material.init();
-	</script> 
-	
-	<script>
-    // Función para obtener y mostrar los datos del archivo JSON
-    async function fetchData() {
-        try {
-            const response = await fetch('data.json'); // Ruta al archivo JSON
-            const data = await response.json();
-
-            // Aquí puedes manejar y mostrar los datos como desees
-            let displayArea = document.createElement('div');
-            displayArea.className = "container";
-
-            data.forEach(item => {
-                let itemDiv = document.createElement('div');
-                itemDiv.className = "data-item";
-                itemDiv.innerHTML = `<p><strong>Code:</strong> ${item.code}</p>
-                                     <p><strong>Name:</strong> ${item.name}</p>
-                                     <p><strong>Status:</strong> ${item.status}</p>`;
-                displayArea.appendChild(itemDiv);
-            });
-
-            document.body.appendChild(displayArea);
-        } catch (error) {
-            console.error("Error al obtener el archivo JSON:", error);
-        }
-    }
-
-    // Llama a la función al cargar la página
-    window.onload = fetchData;
 	</script>
-
+	<script>
+		// Función para guardar datos en el archivo JSON
+		function saveData() {
+			const code = document.getElementById('code').value;
+			const name = document.getElementById('name').value;
+			const status = document.getElementById('status').value;
+	
+			const newData = { code, name, status };
+	
+			// Obtener los datos del archivo JSON
+			fetch('data.json')
+				.then(response => response.json())
+				.then(data => {
+					// Agregar el nuevo dato
+					data.push(newData);
+	
+					// Actualizar el archivo JSON (en un servidor real, esto se haría mediante una petición POST)
+					saveToJSON(data);
+	
+					// Actualizar la tabla de List
+					displayData();
+				});
+		}
+	
+		// Función para actualizar la base de datos (simulación en frontend)
+		function saveToJSON(data) {
+			// Para un entorno de desarrollo en local, guardar en el archivo JSON no es posible sin un backend.
+			// Aquí se utilizaría una petición POST a un servidor para actualizar `data.json`.
+			console.log('Datos guardados en JSON:', JSON.stringify(data));
+		}
+	
+		// Función para mostrar datos en la tabla
+		function displayData() {
+			fetch('data.json')
+				.then(response => response.json())
+				.then(data => {
+					const listTableBody = document.querySelector('#list tbody');
+					listTableBody.innerHTML = ''; // Limpiar la tabla
+	
+					data.forEach((item, index) => {
+						const row = `<tr>
+							<td>${index + 1}</td>
+							<td>${item.code}</td>
+							<td>${item.name}</td>
+							<td>${item.status}</td>
+							<td><a href="#!" class="btn btn-success btn-raised btn-xs"><i class="zmdi zmdi-refresh"></i></a></td>
+							<td><a href="#!" class="btn btn-danger btn-raised btn-xs"><i class="zmdi zmdi-delete"></i></a></td>
+						</tr>`;
+						listTableBody.insertAdjacentHTML('beforeend', row);
+					});
+				});
+		}
+	
+		// Cargar datos al inicio
+		document.addEventListener('DOMContentLoaded', displayData);
+	</script>
 </body>
 </html>
