@@ -307,6 +307,37 @@
 	<script src="./js/main.js"></script>
 	<script>
 		$.material.init();
+	</script> 
+	
+	<script>
+    // Función para obtener y mostrar los datos del archivo JSON
+    async function fetchData() {
+        try {
+            const response = await fetch('data.json'); // Ruta al archivo JSON
+            const data = await response.json();
+
+            // Aquí puedes manejar y mostrar los datos como desees
+            let displayArea = document.createElement('div');
+            displayArea.className = "container";
+
+            data.forEach(item => {
+                let itemDiv = document.createElement('div');
+                itemDiv.className = "data-item";
+                itemDiv.innerHTML = `<p><strong>Code:</strong> ${item.code}</p>
+                                     <p><strong>Name:</strong> ${item.name}</p>
+                                     <p><strong>Status:</strong> ${item.status}</p>`;
+                displayArea.appendChild(itemDiv);
+            });
+
+            document.body.appendChild(displayArea);
+        } catch (error) {
+            console.error("Error al obtener el archivo JSON:", error);
+        }
+    }
+
+    // Llama a la función al cargar la página
+    window.onload = fetchData;
 	</script>
+
 </body>
 </html>
